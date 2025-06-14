@@ -20,7 +20,7 @@ public class TelegramMessageConverter {
 
       if (message.hasPhoto()) {
         var photos = message.getPhoto();
-        var largestPhoto = photos.get(photos.size() - 1);
+        var largestPhoto = photos.getLast();
         messageDto.setPhoto(largestPhoto.getFileId());
       }
 

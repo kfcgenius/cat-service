@@ -20,6 +20,7 @@ public class KafkaMessageProducer {
       var messageJson = objectMapper.writeValueAsString(message);
       kafkaTemplate.send(KafkaTopic.SERVICE, messageJson);
     } catch (Exception e) {
+      e.printStackTrace();
     }
   }
 
@@ -28,6 +29,7 @@ public class KafkaMessageProducer {
       var messageJson = objectMapper.writeValueAsString(message);
       kafkaTemplate.send(KafkaTopic.BOT, messageJson);
     } catch (Exception e) {
+      e.printStackTrace();
     }
   }
 }
