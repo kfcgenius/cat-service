@@ -7,7 +7,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class KafkaRequestDto {
+public class KafkaServiceDto {
+
   private String action;
   private Long userId;
   private String username;

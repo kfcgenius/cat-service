@@ -17,14 +17,12 @@ spring:
 
   kafka:
     bootstrap-servers: localhost:9092
-    consumer:
-      group-id: cat-service
-      auto-offset-reset: earliest
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
-      properties:
-        spring.json.trusted.packages: "*"
-        spring.json.value.default.type: cat_service.dto.KafkaRequestDto
+
+bot:
+  token: 8128054626:AAFHymkyQyLhQ7JDd9NH_fqcYKJ_Mv1l53Y
+
+session:
+  timeoutDays: 1
 
 logging:
   level:
