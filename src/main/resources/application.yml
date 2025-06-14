@@ -1,6 +1,3 @@
-server:
-  port: 8080
-
 spring:
   application:
     name: cat-service
@@ -27,7 +24,7 @@ spring:
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
         spring.json.trusted.packages: "*"
-        spring.json.value.default.type: cat_service.dto.KafkaRequest
+        spring.json.value.default.type: cat_service.dto.KafkaRequestDto
 
 logging:
   level:

@@ -7,10 +7,10 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class KafkaResponse {
+public class KafkaResponseDto<T> {
   private String status;
   private String action;
   private Long userId;
-  private Object result;
   private String error;
+  private T result;
 }
