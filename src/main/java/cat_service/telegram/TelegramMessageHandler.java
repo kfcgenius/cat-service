@@ -44,11 +44,12 @@ public class TelegramMessageHandler {
       case UserState.WAITING_FOR_NAME -> {
         sessionModel.setUsername(requestDto.getText());
         sessionModel.setState(UserState.MAIN_MENU);
-        response.setText("Hello, " + sessionModel.getUsername() + "!");
+        response.setText("Привет " + sessionModel.getUsername() + "!");
         response.setButtons(
             List.of(
-                new TelegramButtonDto("Add cat", "add_cat"),
-                new TelegramButtonDto("Random cat", "view_random_cat")));
+                new TelegramButtonDto("Добавить котика", "add_cat"),
+                new TelegramButtonDto("Смотреть котиков", "view_random_cat"),
+                new TelegramButtonDto("Мои котики", "my_cats")));
         var kafkaMessage = new KafkaServiceDto();
         kafkaMessage.setAction(KafkaAction.GET_OR_CREATE_USER);
         kafkaMessage.setUserId(requestDto.getChatId());
@@ -58,13 +59,12 @@ public class TelegramMessageHandler {
       case ADDING_CAT_NAME -> {
         sessionModel.setCatName(requestDto.getText());
         sessionModel.setState(UserState.CONFIRMING_CAT);
-        response.setText(
-            "Cat name: " + sessionModel.getCatName() + "\nPlease confirm or enter again.");
+        response.setText("Какое красивое имя! Ты хочешь его оставить?");
         response.setButtons(
             List.of(
-                new TelegramButtonDto("Confirm", "confirm_cat_name"),
-                new TelegramButtonDto("Again", "add_cat"),
-                new TelegramButtonDto("\uD83C\uDFE0 Menu", "main_menu")));
+                new TelegramButtonDto("Подтвердить", "confirm_cat_name"),
+                new TelegramButtonDto("Повторить", "add_cat"),
+                new TelegramButtonDto("В меню", "main_menu")));
       }
     }
   }
@@ -74,7 +74,7 @@ public class TelegramMessageHandler {
     switch (requestDto.getCommand()) {
       case "/start" -> {
         sessionModel.setState(UserState.WAITING_FOR_NAME);
-        response.setText("Welcome! What's your name?");
+        response.setText("Привет, как тебя зовут?");
       }
     }
   }
@@ -85,12 +85,12 @@ public class TelegramMessageHandler {
       case UserState.ADDING_CAT_PHOTO -> {
         sessionModel.setCatPhoto(requestDto.getPhoto());
         sessionModel.setState(UserState.CONFIRMING_CAT);
-        response.setText("Here is your cat: " + sessionModel.getCatName());
+        response.setText(sessionModel.getCatName() + "\nАвтор: @" + sessionModel.getUsername());
         response.setPhoto(sessionModel.getCatPhoto());
         response.setButtons(
             List.of(
-                new TelegramButtonDto("Confirm", "confirm_cat"),
-                new TelegramButtonDto("\uD83C\uDFE0 Menu", "main_menu")));
+                new TelegramButtonDto("Подтвердить", "confirm_cat"),
+                new TelegramButtonDto("В меню", "main_menu")));
       }
     }
   }
@@ -99,11 +99,12 @@ public class TelegramMessageHandler {
       TelegramRequestDto requestDto, UserSessionModel sessionModel, TelegramResponseDto response) {
     switch (requestDto.getCallback()) {
       case String callback when callback.startsWith("like_") -> {
-        response.setText("You liked the cat!");
+        response.setText("Лайк сохранен");
         response.setButtons(
             List.of(
-                new TelegramButtonDto("Add cat", "add_cat"),
-                new TelegramButtonDto("View random cat", "view_random_cat")));
+                new TelegramButtonDto("Добавить котика", "add_cat"),
+                new TelegramButtonDto("Смотреть котиков", "view_random_cat"),
+                new TelegramButtonDto("Мои котики", "my_cats")));
         var catId = Long.parseLong(callback.substring("like_".length()));
         var kafkaMessage = new KafkaServiceDto();
         kafkaMessage.setAction(KafkaAction.LIKE_CAT);
@@ -112,11 +113,12 @@ public class TelegramMessageHandler {
         kafkaProducer.sendToService(kafkaMessage);
       }
       case String callback when callback.startsWith("dislike_") -> {
-        response.setText("You disliked the cat.");
+        response.setText("Дизлайк сохранен");
         response.setButtons(
             List.of(
-                new TelegramButtonDto("Add cat", "add_cat"),
-                new TelegramButtonDto("View random cat", "view_random_cat")));
+                new TelegramButtonDto("Добавить котика", "add_cat"),
+                new TelegramButtonDto("Смотреть котиков", "view_random_cat"),
+                new TelegramButtonDto("Мои котики", "my_cats")));
         var catId = Long.parseLong(callback.substring("dislike_".length()));
         var kafkaMessage = new KafkaServiceDto();
         kafkaMessage.setAction(KafkaAction.DISLIKE_CAT);
@@ -124,21 +126,38 @@ public class TelegramMessageHandler {
         kafkaMessage.setCatId(catId);
         kafkaProducer.sendToService(kafkaMessage);
       }
+      case String callback when callback.startsWith("view_cat_") -> {
+        var catId = Long.parseLong(callback.substring("view_cat_".length()));
+        var kafkaMessage = new KafkaServiceDto();
+        kafkaMessage.setAction(KafkaAction.GET_CAT);
+        kafkaMessage.setUserId(sessionModel.getChatId());
+        kafkaMessage.setCatId(catId);
+        kafkaProducer.sendToService(kafkaMessage);
+      }
+      case String callback when callback.startsWith("delete_cat_") -> {
+        var catId = Long.parseLong(callback.substring("delete_cat_".length()));
+        var kafkaMessage = new KafkaServiceDto();
+        kafkaMessage.setAction(KafkaAction.DELETE_CAT);
+        kafkaMessage.setUserId(sessionModel.getChatId());
+        kafkaMessage.setCatId(catId);
+        kafkaProducer.sendToService(kafkaMessage);
+      }
       case "add_cat" -> {
         sessionModel.setState(UserState.ADDING_CAT_NAME);
-        response.setText("What's the cat's name?");
+        response.setText("Как зовут твоего котика?");
       }
       case "confirm_cat_name" -> {
         sessionModel.setState(UserState.ADDING_CAT_PHOTO);
-        response.setText("Please send a photo of " + sessionModel.getCatName());
+        response.setText("Покажи мне фото своего котика");
       }
       case "confirm_cat" -> {
         sessionModel.setState(UserState.MAIN_MENU);
-        response.setText("Cat saved successfully!");
+        response.setText("Ура, котик добавлен!");
         response.setButtons(
             List.of(
-                new TelegramButtonDto("Add cat", "add_cat"),
-                new TelegramButtonDto("\uD83C\uDFE0 Menu", "main_menu")));
+                new TelegramButtonDto("Добавить котика", "add_cat"),
+                new TelegramButtonDto("Смотреть котиков", "view_random_cat"),
+                new TelegramButtonDto("Мои котики", "my_cats")));
         var kafkaMessage =
             new KafkaServiceDto(
                 KafkaAction.CREATE_CAT,
@@ -150,19 +169,25 @@ public class TelegramMessageHandler {
         kafkaProducer.sendToService(kafkaMessage);
       }
       case "view_random_cat" -> {
-        response.setText("Fetching a random cat for you...");
         var kafkaRequest = new KafkaServiceDto();
         kafkaRequest.setAction(KafkaAction.GET_RANDOM_CAT);
         kafkaRequest.setUserId(sessionModel.getChatId());
         kafkaProducer.sendToService(kafkaRequest);
       }
+      case "my_cats" -> {
+        var kafkaRequest = new KafkaServiceDto();
+        kafkaRequest.setAction(KafkaAction.GET_USER_CATS);
+        kafkaRequest.setUserId(sessionModel.getChatId());
+        kafkaProducer.sendToService(kafkaRequest);
+      }
       case "main_menu" -> {
         sessionModel.setState(UserState.MAIN_MENU);
-        response.setText("Hello, " + sessionModel.getUsername() + "!");
+        response.setText("Привет " + sessionModel.getUsername() + "!");
         response.setButtons(
             List.of(
-                new TelegramButtonDto("Add cat", "add_cat"),
-                new TelegramButtonDto("Random cat", "view_random_cat")));
+                new TelegramButtonDto("Добавить котика", "add_cat"),
+                new TelegramButtonDto("Смотреть котиков", "view_random_cat"),
+                new TelegramButtonDto("Мои котики", "my_cats")));
       }
       default -> throw new IllegalStateException("Unexpected value: " + requestDto.getCallback());
     }

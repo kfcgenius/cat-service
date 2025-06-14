@@ -46,6 +46,18 @@ public class KafkaServiceMessageConsumer {
                 catDtos);
         kafkaMessageProducer.sendToBot(kafkaResponseDto);
       }
+      case KafkaAction.GET_CAT -> {
+        var catModel = catService.getCat(request.getCatId());
+        var catDto = catMapper.toDto(catModel);
+        var kafkaResponseDto =
+            new KafkaBotDto(
+                KafkaResponseStatus.SUCCESS,
+                request.getAction(),
+                request.getUserId(),
+                null,
+                catDto);
+        kafkaMessageProducer.sendToBot(kafkaResponseDto);
+      }
       case KafkaAction.DELETE_CAT -> catService.deleteCat(request.getUserId(), request.getCatId());
       case KafkaAction.GET_RANDOM_CAT -> {
         var catModel = catService.getRandomUnratedCat(request.getUserId());

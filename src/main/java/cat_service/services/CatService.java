@@ -46,6 +46,15 @@ public class CatService {
         .toList();
   }
 
+  @Transactional(readOnly = true)
+  public CatModel getCat(Long catId) {
+    var catEntity =
+        catRepository
+            .findById(catId)
+            .orElseThrow(() -> new EntityNotFoundException("Cat not found with id: " + catId));
+    return catMapper.toModel(catEntity);
+  }
+
   @Transactional
   public CatModel likeCat(Long catId, Long userId) {
     var userEntity =
@@ -116,6 +125,15 @@ public class CatService {
             .findById(catId)
             .filter(cat -> cat.getOwner().getId().equals(userId))
             .orElseThrow(() -> new EntityNotFoundException("Cat not found or not owned by user"));
+
+    catEntity.getLikedByUsers().forEach(user -> user.getLikedCats().remove(catEntity));
+    catEntity.getDislikedByUsers().forEach(user -> user.getDislikedCats().remove(catEntity));
+
+    catEntity.getLikedByUsers().clear();
+    catEntity.getDislikedByUsers().clear();
+
+    catRepository.save(catEntity);
+
     catRepository.delete(catEntity);
     return catMapper.toModel(catEntity);
   }

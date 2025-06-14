@@ -12,6 +12,7 @@ public class CatMapper {
     var model = new CatModel();
     model.setId(entity.getId());
     model.setName(entity.getName());
+    model.setOwner(entity.getOwner().getUsername());
     model.setPhotoUrl(entity.getPhotoUrl());
     model.setLikes(entity.getLikedByUsers().size());
     model.setDislikes(entity.getDislikedByUsers().size());
@@ -22,6 +23,7 @@ public class CatMapper {
     var dto = new CatDto();
     dto.setId(model.getId());
     dto.setName(model.getName());
+    dto.setOwner(model.getOwner());
     dto.setPhotoUrl(model.getPhotoUrl());
     dto.setLikes(model.getLikes());
     dto.setDislikes(model.getDislikes());

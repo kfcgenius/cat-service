@@ -8,4 +8,5 @@ public interface KafkaAction {
   String GET_USER_CATS = "GET_USER_CATS";
   String GET_RANDOM_CAT = "GET_RANDOM_CAT";
   String GET_OR_CREATE_USER = "GET_OR_CREATE_USER";
+  String GET_CAT = "GET_CAT";
 }

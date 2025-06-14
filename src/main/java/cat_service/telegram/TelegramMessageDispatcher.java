@@ -41,6 +41,9 @@ public class TelegramMessageDispatcher {
 
   public void sendPhotoTextButtons(
       Long chatId, String photoFileId, String caption, List<TelegramButtonDto> buttons) {
+    if (photoFileId == null) {
+      return;
+    }
     var message =
         SendPhoto.builder()
             .chatId(chatId)
@@ -56,6 +59,9 @@ public class TelegramMessageDispatcher {
   }
 
   public void sendTextButtons(Long chatId, String text, List<TelegramButtonDto> buttons) {
+    if (text == null) {
+      return;
+    }
     var message = SendMessage.builder().chatId(chatId).text(text).build();
     message.setReplyMarkup(buildInlineKeyboard(buttons));
     try {
@@ -66,6 +72,9 @@ public class TelegramMessageDispatcher {
   }
 
   private void sendText(Long chatId, String text) {
+    if (text == null) {
+      return;
+    }
     var message = SendMessage.builder().chatId(chatId).text(text).build();
     try {
       client.execute(message);
