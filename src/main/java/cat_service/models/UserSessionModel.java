@@ -11,4 +11,10 @@ public class UserSessionModel {
   private String catName;
   private String catPhoto;
   private UserState state;
+
+  public void reset() {
+    username = null;
+    catName = null;
+    catPhoto = null;
+  }
 }

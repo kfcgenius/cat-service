@@ -148,6 +148,7 @@ public class TelegramMessageHandler {
         kafkaProducer.sendToServiceTopic(kafkaMessage);
       }
       case TelegramCallback.ADD_CAT -> {
+        sessionModel.reset();
         sessionModel.setState(UserState.ADDING_CAT_NAME);
         response.setText(TelegramText.ADD_CAT);
       }
