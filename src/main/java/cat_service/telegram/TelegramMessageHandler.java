@@ -1,6 +1,8 @@
 package cat_service.telegram;
 
 import cat_service.constants.KafkaAction;
+import cat_service.constants.TelegramCallback;
+import cat_service.constants.TelegramText;
 import cat_service.dto.*;
 import cat_service.enums.UserState;
 import cat_service.kafka.KafkaMessageProducer;
@@ -44,27 +46,28 @@ public class TelegramMessageHandler {
       case UserState.WAITING_FOR_NAME -> {
         sessionModel.setUsername(requestDto.getText());
         sessionModel.setState(UserState.MAIN_MENU);
-        response.setText("Привет " + sessionModel.getUsername() + "!");
+        response.setText(String.format(TelegramText.GREETING_USER, sessionModel.getUsername()));
         response.setButtons(
             List.of(
-                new TelegramButtonDto("Добавить котика", "add_cat"),
-                new TelegramButtonDto("Смотреть котиков", "view_random_cat"),
-                new TelegramButtonDto("Мои котики", "my_cats")));
+                new TelegramButtonDto(TelegramText.ADD_CAT, TelegramCallback.ADD_CAT),
+                new TelegramButtonDto(
+                    TelegramText.VIEW_RANDOM_CAT, TelegramCallback.VIEW_RANDOM_CAT),
+                new TelegramButtonDto(TelegramText.MY_CATS, TelegramCallback.MY_CATS)));
         var kafkaMessage = new KafkaServiceDto();
         kafkaMessage.setAction(KafkaAction.GET_OR_CREATE_USER);
         kafkaMessage.setUserId(requestDto.getChatId());
         kafkaMessage.setUsername(sessionModel.getUsername());
-        kafkaProducer.sendToService(kafkaMessage);
+        kafkaProducer.sendToServiceTopic(kafkaMessage);
       }
       case ADDING_CAT_NAME -> {
         sessionModel.setCatName(requestDto.getText());
         sessionModel.setState(UserState.CONFIRMING_CAT);
-        response.setText("Какое красивое имя! Ты хочешь его оставить?");
+        response.setText(TelegramText.CONFIRM_CAT_NAME);
         response.setButtons(
             List.of(
-                new TelegramButtonDto("Подтвердить", "confirm_cat_name"),
-                new TelegramButtonDto("Повторить", "add_cat"),
-                new TelegramButtonDto("В меню", "main_menu")));
+                new TelegramButtonDto(TelegramText.BTN_CONFIRM, TelegramCallback.CONFIRM_CAT_NAME),
+                new TelegramButtonDto(TelegramText.BTN_REPEAT, TelegramCallback.ADD_CAT),
+                new TelegramButtonDto(TelegramText.BTN_MAIN_MENU, TelegramCallback.MAIN_MENU)));
       }
     }
   }
@@ -74,7 +77,7 @@ public class TelegramMessageHandler {
     switch (requestDto.getCommand()) {
       case "/start" -> {
         sessionModel.setState(UserState.WAITING_FOR_NAME);
-        response.setText("Привет, как тебя зовут?");
+        response.setText(TelegramText.GREETING_ASK_NAME);
       }
     }
   }
@@ -89,8 +92,8 @@ public class TelegramMessageHandler {
         response.setPhoto(sessionModel.getCatPhoto());
         response.setButtons(
             List.of(
-                new TelegramButtonDto("Подтвердить", "confirm_cat"),
-                new TelegramButtonDto("В меню", "main_menu")));
+                new TelegramButtonDto(TelegramText.BTN_CONFIRM, TelegramCallback.CONFIRM_CAT),
+                new TelegramButtonDto(TelegramText.BTN_MAIN_MENU, TelegramCallback.MAIN_MENU)));
       }
     }
   }
@@ -98,66 +101,69 @@ public class TelegramMessageHandler {
   private void handleCallback(
       TelegramRequestDto requestDto, UserSessionModel sessionModel, TelegramResponseDto response) {
     switch (requestDto.getCallback()) {
-      case String callback when callback.startsWith("like_") -> {
-        response.setText("Лайк сохранен");
+      case String callback when callback.startsWith(TelegramCallback.LIKE_PREFIX) -> {
+        response.setText(TelegramText.LIKE_SAVED);
         response.setButtons(
             List.of(
-                new TelegramButtonDto("Добавить котика", "add_cat"),
-                new TelegramButtonDto("Смотреть котиков", "view_random_cat"),
-                new TelegramButtonDto("Мои котики", "my_cats")));
-        var catId = Long.parseLong(callback.substring("like_".length()));
+                new TelegramButtonDto(TelegramText.ADD_CAT, TelegramCallback.ADD_CAT),
+                new TelegramButtonDto(
+                    TelegramText.VIEW_RANDOM_CAT, TelegramCallback.VIEW_RANDOM_CAT),
+                new TelegramButtonDto(TelegramText.MY_CATS, TelegramCallback.MY_CATS)));
+        var catId = Long.parseLong(callback.substring(TelegramCallback.LIKE_PREFIX.length()));
         var kafkaMessage = new KafkaServiceDto();
         kafkaMessage.setAction(KafkaAction.LIKE_CAT);
         kafkaMessage.setUserId(sessionModel.getChatId());
         kafkaMessage.setCatId(catId);
-        kafkaProducer.sendToService(kafkaMessage);
+        kafkaProducer.sendToServiceTopic(kafkaMessage);
       }
-      case String callback when callback.startsWith("dislike_") -> {
-        response.setText("Дизлайк сохранен");
+      case String callback when callback.startsWith(TelegramCallback.DISLIKE_PREFIX) -> {
+        response.setText(TelegramText.DISLIKE_SAVED);
         response.setButtons(
             List.of(
-                new TelegramButtonDto("Добавить котика", "add_cat"),
-                new TelegramButtonDto("Смотреть котиков", "view_random_cat"),
-                new TelegramButtonDto("Мои котики", "my_cats")));
-        var catId = Long.parseLong(callback.substring("dislike_".length()));
+                new TelegramButtonDto(TelegramText.ADD_CAT, TelegramCallback.ADD_CAT),
+                new TelegramButtonDto(
+                    TelegramText.VIEW_RANDOM_CAT, TelegramCallback.VIEW_RANDOM_CAT),
+                new TelegramButtonDto(TelegramText.MY_CATS, TelegramCallback.MY_CATS)));
+        var catId = Long.parseLong(callback.substring(TelegramCallback.DISLIKE_PREFIX.length()));
         var kafkaMessage = new KafkaServiceDto();
         kafkaMessage.setAction(KafkaAction.DISLIKE_CAT);
         kafkaMessage.setUserId(sessionModel.getChatId());
         kafkaMessage.setCatId(catId);
-        kafkaProducer.sendToService(kafkaMessage);
+        kafkaProducer.sendToServiceTopic(kafkaMessage);
       }
-      case String callback when callback.startsWith("view_cat_") -> {
-        var catId = Long.parseLong(callback.substring("view_cat_".length()));
+      case String callback when callback.startsWith(TelegramCallback.VIEW_CAT_PREFIX) -> {
+        var catId = Long.parseLong(callback.substring(TelegramCallback.VIEW_CAT_PREFIX.length()));
         var kafkaMessage = new KafkaServiceDto();
         kafkaMessage.setAction(KafkaAction.GET_CAT);
         kafkaMessage.setUserId(sessionModel.getChatId());
         kafkaMessage.setCatId(catId);
-        kafkaProducer.sendToService(kafkaMessage);
+        kafkaProducer.sendToServiceTopic(kafkaMessage);
       }
-      case String callback when callback.startsWith("delete_cat_") -> {
-        var catId = Long.parseLong(callback.substring("delete_cat_".length()));
+      case String callback when callback.startsWith(TelegramCallback.DELETE_CAT_PREFIX) -> {
+        var catId = Long.parseLong(callback.substring(TelegramCallback.DELETE_CAT_PREFIX.length()));
         var kafkaMessage = new KafkaServiceDto();
         kafkaMessage.setAction(KafkaAction.DELETE_CAT);
         kafkaMessage.setUserId(sessionModel.getChatId());
         kafkaMessage.setCatId(catId);
-        kafkaProducer.sendToService(kafkaMessage);
+        kafkaProducer.sendToServiceTopic(kafkaMessage);
       }
-      case "add_cat" -> {
+      case TelegramCallback.ADD_CAT -> {
         sessionModel.setState(UserState.ADDING_CAT_NAME);
-        response.setText("Как зовут твоего котика?");
+        response.setText(TelegramText.ADD_CAT);
       }
-      case "confirm_cat_name" -> {
+      case TelegramCallback.CONFIRM_CAT_NAME -> {
         sessionModel.setState(UserState.ADDING_CAT_PHOTO);
-        response.setText("Покажи мне фото своего котика");
+        response.setText(TelegramText.ASK_CAT_PHOTO);
       }
-      case "confirm_cat" -> {
+      case TelegramCallback.CONFIRM_CAT -> {
         sessionModel.setState(UserState.MAIN_MENU);
-        response.setText("Ура, котик добавлен!");
+        response.setText(TelegramText.CAT_ADDED);
         response.setButtons(
             List.of(
-                new TelegramButtonDto("Добавить котика", "add_cat"),
-                new TelegramButtonDto("Смотреть котиков", "view_random_cat"),
-                new TelegramButtonDto("Мои котики", "my_cats")));
+                new TelegramButtonDto(TelegramText.ADD_CAT, TelegramCallback.ADD_CAT),
+                new TelegramButtonDto(
+                    TelegramText.VIEW_RANDOM_CAT, TelegramCallback.VIEW_RANDOM_CAT),
+                new TelegramButtonDto(TelegramText.MY_CATS, TelegramCallback.MY_CATS)));
         var kafkaMessage =
             new KafkaServiceDto(
                 KafkaAction.CREATE_CAT,
@@ -166,28 +172,29 @@ public class TelegramMessageHandler {
                 null,
                 sessionModel.getCatName(),
                 sessionModel.getCatPhoto());
-        kafkaProducer.sendToService(kafkaMessage);
+        kafkaProducer.sendToServiceTopic(kafkaMessage);
       }
-      case "view_random_cat" -> {
+      case TelegramCallback.VIEW_RANDOM_CAT -> {
         var kafkaRequest = new KafkaServiceDto();
         kafkaRequest.setAction(KafkaAction.GET_RANDOM_CAT);
         kafkaRequest.setUserId(sessionModel.getChatId());
-        kafkaProducer.sendToService(kafkaRequest);
+        kafkaProducer.sendToServiceTopic(kafkaRequest);
       }
-      case "my_cats" -> {
+      case TelegramCallback.MY_CATS -> {
         var kafkaRequest = new KafkaServiceDto();
         kafkaRequest.setAction(KafkaAction.GET_USER_CATS);
         kafkaRequest.setUserId(sessionModel.getChatId());
-        kafkaProducer.sendToService(kafkaRequest);
+        kafkaProducer.sendToServiceTopic(kafkaRequest);
       }
-      case "main_menu" -> {
+      case TelegramCallback.MAIN_MENU -> {
         sessionModel.setState(UserState.MAIN_MENU);
-        response.setText("Привет " + sessionModel.getUsername() + "!");
+        response.setText(String.format(TelegramText.GREETING_USER, sessionModel.getUsername()));
         response.setButtons(
             List.of(
-                new TelegramButtonDto("Добавить котика", "add_cat"),
-                new TelegramButtonDto("Смотреть котиков", "view_random_cat"),
-                new TelegramButtonDto("Мои котики", "my_cats")));
+                new TelegramButtonDto(TelegramText.ADD_CAT, TelegramCallback.ADD_CAT),
+                new TelegramButtonDto(
+                    TelegramText.VIEW_RANDOM_CAT, TelegramCallback.VIEW_RANDOM_CAT),
+                new TelegramButtonDto(TelegramText.MY_CATS, TelegramCallback.MY_CATS)));
       }
       default -> throw new IllegalStateException("Unexpected value: " + requestDto.getCallback());
     }
