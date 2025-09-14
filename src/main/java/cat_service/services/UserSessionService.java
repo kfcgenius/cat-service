@@ -1,6 +1,5 @@
 package cat_service.services;
 
-import cat_service.configs.SessionConfig;
 import cat_service.entities.UserSessionEntity;
 import cat_service.models.UserSessionModel;
 import cat_service.repositories.UserSessionRepository;
@@ -12,7 +11,6 @@ import org.springframework.stereotype.Service;
 public class UserSessionService {
 
   private final UserSessionRepository repository;
-  private final SessionConfig configs;
 
   public UserSessionModel get(Long chatId) {
     var sessionEntity =
