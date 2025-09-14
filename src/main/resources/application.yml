@@ -18,6 +18,12 @@ spring:
       hibernate:
         format_sql: true
 
+bot:
+  token: _
+
+session:
+  timeoutDays: 1
+
 logging:
   level:
     org.apache.kafka: WARN
