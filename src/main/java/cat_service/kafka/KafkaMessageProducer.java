@@ -15,7 +15,7 @@ public class KafkaMessageProducer {
   private final KafkaTemplate<String, String> kafkaTemplate;
   private final ObjectMapper objectMapper;
 
-  public void sendToService(KafkaServiceDto message) {
+  public void sendToServiceTopic(KafkaServiceDto message) {
     try {
       var messageJson = objectMapper.writeValueAsString(message);
       kafkaTemplate.send(KafkaTopic.SERVICE, messageJson);
@@ -24,7 +24,7 @@ public class KafkaMessageProducer {
     }
   }
 
-  public void sendToBot(KafkaBotDto message) {
+  public void sendToBotTopic(KafkaBotDto message) {
     try {
       var messageJson = objectMapper.writeValueAsString(message);
       kafkaTemplate.send(KafkaTopic.BOT, messageJson);

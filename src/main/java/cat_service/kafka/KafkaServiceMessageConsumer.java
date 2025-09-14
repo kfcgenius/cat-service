@@ -44,7 +44,7 @@ public class KafkaServiceMessageConsumer {
                 request.getUserId(),
                 null,
                 catDtos);
-        kafkaMessageProducer.sendToBot(kafkaResponseDto);
+        kafkaMessageProducer.sendToBotTopic(kafkaResponseDto);
       }
       case KafkaAction.GET_CAT -> {
         var catModel = catService.getCat(request.getCatId());
@@ -56,7 +56,7 @@ public class KafkaServiceMessageConsumer {
                 request.getUserId(),
                 null,
                 catDto);
-        kafkaMessageProducer.sendToBot(kafkaResponseDto);
+        kafkaMessageProducer.sendToBotTopic(kafkaResponseDto);
       }
       case KafkaAction.DELETE_CAT -> catService.deleteCat(request.getUserId(), request.getCatId());
       case KafkaAction.GET_RANDOM_CAT -> {
@@ -69,7 +69,7 @@ public class KafkaServiceMessageConsumer {
                 request.getUserId(),
                 null,
                 catDto);
-        kafkaMessageProducer.sendToBot(kafkaResponseDto);
+        kafkaMessageProducer.sendToBotTopic(kafkaResponseDto);
       }
       case KafkaAction.GET_OR_CREATE_USER ->
           userService.getOrCreateUser(request.getUserId(), request.getUsername());
