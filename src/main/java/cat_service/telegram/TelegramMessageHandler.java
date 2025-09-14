@@ -196,7 +196,16 @@ public class TelegramMessageHandler {
                     TelegramText.VIEW_RANDOM_CAT, TelegramCallback.VIEW_RANDOM_CAT),
                 new TelegramButtonDto(TelegramText.MY_CATS, TelegramCallback.MY_CATS)));
       }
-      default -> throw new IllegalStateException("Unexpected value: " + requestDto.getCallback());
+      default -> {
+        sessionModel.setState(UserState.MAIN_MENU);
+        response.setText(String.format(TelegramText.ERROR, requestDto.getCallback()));
+        response.setButtons(
+            List.of(
+                new TelegramButtonDto(TelegramText.ADD_CAT, TelegramCallback.ADD_CAT),
+                new TelegramButtonDto(
+                    TelegramText.VIEW_RANDOM_CAT, TelegramCallback.VIEW_RANDOM_CAT),
+                new TelegramButtonDto(TelegramText.MY_CATS, TelegramCallback.MY_CATS)));
+      }
     }
   }
 }

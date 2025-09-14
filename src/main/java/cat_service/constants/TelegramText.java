@@ -14,4 +14,6 @@ public interface TelegramText {
   String BTN_CONFIRM = "Подтвердить";
   String BTN_REPEAT = "Повторить";
   String BTN_MAIN_MENU = "В меню";
+  String ERROR =
+      "Ошибка на стороне сервиса. Свяжитесь с разсработчиками. Быда нажата несуществующая кнопка %s";
 }
