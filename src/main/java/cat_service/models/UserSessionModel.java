@@ -13,7 +13,6 @@ public class UserSessionModel {
   private UserState state;
 
   public void reset() {
-    username = null;
     catName = null;
     catPhoto = null;
   }

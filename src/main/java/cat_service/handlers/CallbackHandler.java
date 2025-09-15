@@ -43,7 +43,7 @@ public class CallbackHandler {
       case TelegramCallback.ADD_CAT -> {
         session.reset();
         session.setState(UserState.ADDING_CAT_NAME);
-        response.setText(TelegramText.ADD_CAT);
+        response.setText(TelegramText.ASK_CAT_NAME);
       }
       case TelegramCallback.CONFIRM_CAT_NAME -> {
         session.setState(UserState.ADDING_CAT_PHOTO);

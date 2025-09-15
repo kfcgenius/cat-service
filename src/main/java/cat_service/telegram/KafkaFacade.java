@@ -1,5 +1,8 @@
 package cat_service.telegram;
 
+import cat_service.constants.KafkaAction;
+import cat_service.dto.KafkaServiceDto;
+import cat_service.kafka.KafkaMessageProducer;
 import cat_service.models.UserSessionModel;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

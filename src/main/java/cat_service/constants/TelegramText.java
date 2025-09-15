@@ -2,6 +2,7 @@ package cat_service.constants;
 
 public interface TelegramText {
   String ADD_CAT = "Добавить котика";
+  String ASK_CAT_NAME = "Как зовут твоего котика?";
   String MY_CATS = "Мои котики";
   String VIEW_RANDOM_CAT = "Смотреть котиков";
   String GREETING_ASK_NAME = "Привет, как тебя зовут?";
