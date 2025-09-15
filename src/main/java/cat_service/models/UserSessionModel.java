@@ -9,7 +9,7 @@ public class UserSessionModel {
   private Long chatId;
   private String username;
   private String catName;
-  private String catPhoto;
+  private byte[] catPhoto;
   private UserState state;
 
   public void reset() {

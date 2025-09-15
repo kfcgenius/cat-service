@@ -15,7 +15,9 @@ public class UserSessionEntity {
   @Id private Long chatId;
   private String username;
   private String catName;
-  private String catPhoto;
+
+  @Lob private byte[] catPhoto;
+
   private UserState state = UserState.STARTED;
 
   @Column(name = "updated_at")

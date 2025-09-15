@@ -9,5 +9,5 @@ public class TelegramRequestDto {
   private String text;
   private String command;
   private String callback;
-  private String photo;
+  private byte[] photo;
 }
