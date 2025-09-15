@@ -1,13 +1,9 @@
 package cat_service.services;
 
-import cat_service.configs.SessionConfig;
 import cat_service.entities.UserSessionEntity;
 import cat_service.models.UserSessionModel;
 import cat_service.repositories.UserSessionRepository;
-import java.time.Duration;
-import java.time.Instant;
 import lombok.RequiredArgsConstructor;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -15,7 +11,6 @@ import org.springframework.stereotype.Service;
 public class UserSessionService {
 
   private final UserSessionRepository repository;
-  private final SessionConfig configs;
 
   public UserSessionModel get(Long chatId) {
     var sessionEntity =
@@ -44,11 +39,5 @@ public class UserSessionService {
     sessionEntity.setCatPhoto(sessionModel.getCatPhoto());
     sessionEntity.setState(sessionModel.getState());
     repository.save(sessionEntity);
-  }
-
-  @Scheduled(fixedRate = 3600000)
-  public void cleanUpOldSessions() {
-    var expiryTime = Instant.now().minus(Duration.ofDays(configs.getTimeoutDays()));
-    repository.deleteOldSessions(expiryTime);
   }
 }
