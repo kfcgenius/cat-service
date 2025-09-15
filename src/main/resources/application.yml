@@ -1,0 +1,26 @@
+spring:
+  application:
+    name: cat-service
+
+  datasource:
+    url: jdbc:postgresql://localhost:5433/postgres
+    username: postgres
+    password: postgres
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+bot:
+  token: _
+
+session:
+  timeoutDays: 1
+
+logging:
+  level:
+    org.apache.kafka: WARN
