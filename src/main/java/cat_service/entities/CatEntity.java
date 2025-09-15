@@ -17,8 +17,7 @@ public class CatEntity {
   @Column(nullable = false)
   private String name;
 
-  @Column(nullable = false)
-  private String photoUrl;
+  @Lob private byte[] catPhoto;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "owner_id")

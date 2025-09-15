@@ -14,5 +14,5 @@ public class KafkaServiceDto {
   private String username;
   private Long catId;
   private String name;
-  private String photoUrl;
+  private byte[] photo;
 }

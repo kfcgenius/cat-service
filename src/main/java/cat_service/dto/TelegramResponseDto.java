@@ -8,6 +8,6 @@ public class TelegramResponseDto {
 
   private Long chatId;
   private String text;
-  private String photo;
+  private byte[] photo;
   private List<TelegramButtonDto> buttons;
 }

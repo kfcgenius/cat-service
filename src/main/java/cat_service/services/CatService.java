@@ -20,7 +20,7 @@ public class CatService {
   private final CatMapper catMapper;
 
   @Transactional
-  public CatModel createCat(String name, String photoUrl, Long userId) {
+  public CatModel createCat(String name, byte[] photo, Long userId) {
     var user =
         userRepository
             .findById(userId)
@@ -28,7 +28,7 @@ public class CatService {
 
     var catEntity = new CatEntity();
     catEntity.setName(name);
-    catEntity.setPhotoUrl(photoUrl);
+    catEntity.setCatPhoto(photo);
     catEntity.setOwner(user);
 
     var savedCat = catRepository.save(catEntity);

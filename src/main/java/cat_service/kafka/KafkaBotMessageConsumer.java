@@ -39,7 +39,7 @@ public class KafkaBotMessageConsumer {
       case KafkaAction.GET_RANDOM_CAT -> {
         var catDto = objectMapper.convertValue(request.getResult(), CatDto.class);
         telegramResponse.setText(catDto.getName() + "\nАвтор: @" + catDto.getOwner());
-        telegramResponse.setPhoto(catDto.getPhotoUrl());
+        telegramResponse.setPhoto(catDto.getPhoto());
         telegramResponse.setButtons(
             List.of(
                 new TelegramButtonDto("👍 (" + catDto.getLikes() + ")", "like_" + catDto.getId()),
@@ -50,7 +50,7 @@ public class KafkaBotMessageConsumer {
       case KafkaAction.GET_CAT -> {
         var catDto = objectMapper.convertValue(request.getResult(), CatDto.class);
         telegramResponse.setText(catDto.getName() + "\nАвтор: @" + catDto.getOwner());
-        telegramResponse.setPhoto(catDto.getPhotoUrl());
+        telegramResponse.setPhoto(catDto.getPhoto());
         telegramResponse.setButtons(
             List.of(
                 new TelegramButtonDto("Удалить", "delete_cat_" + catDto.getId()),

@@ -13,7 +13,7 @@ public class CatMapper {
     model.setId(entity.getId());
     model.setName(entity.getName());
     model.setOwner(entity.getOwner().getUsername());
-    model.setPhotoUrl(entity.getPhotoUrl());
+    model.setPhoto(entity.getCatPhoto());
     model.setLikes(entity.getLikedByUsers().size());
     model.setDislikes(entity.getDislikedByUsers().size());
     return model;
@@ -24,7 +24,7 @@ public class CatMapper {
     dto.setId(model.getId());
     dto.setName(model.getName());
     dto.setOwner(model.getOwner());
-    dto.setPhotoUrl(model.getPhotoUrl());
+    dto.setPhoto(model.getPhoto());
     dto.setLikes(model.getLikes());
     dto.setDislikes(model.getDislikes());
     return dto;

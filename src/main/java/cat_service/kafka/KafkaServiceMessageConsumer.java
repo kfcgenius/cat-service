@@ -30,7 +30,7 @@ public class KafkaServiceMessageConsumer {
     var request = objectMapper.readValue(message, KafkaServiceDto.class);
     switch (request.getAction()) {
       case KafkaAction.CREATE_CAT ->
-          catService.createCat(request.getName(), request.getPhotoUrl(), request.getUserId());
+          catService.createCat(request.getName(), request.getPhoto(), request.getUserId());
       case KafkaAction.LIKE_CAT -> catService.likeCat(request.getCatId(), request.getUserId());
       case KafkaAction.DISLIKE_CAT ->
           catService.dislikeCat(request.getCatId(), request.getUserId());

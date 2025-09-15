@@ -3,6 +3,7 @@ package cat_service.telegram;
 import cat_service.configs.TelegramConfigs;
 import cat_service.dto.TelegramButtonDto;
 import cat_service.dto.TelegramResponseDto;
+import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Component;
@@ -31,7 +32,7 @@ public class TelegramMessageDispatcher {
           response.getChatId(), response.getPhoto(), response.getText(), response.getButtons());
       return;
     }
-    if (response.getButtons() != null && response.getButtons().size() > 0) {
+    if (response.getButtons() != null && !response.getButtons().isEmpty()) {
       sendTextButtons(response.getChatId(), response.getText(), response.getButtons());
       return;
     }
@@ -40,14 +41,14 @@ public class TelegramMessageDispatcher {
   }
 
   public void sendPhotoTextButtons(
-      Long chatId, String photoFileId, String caption, List<TelegramButtonDto> buttons) {
-    if (photoFileId == null) {
+      Long chatId, byte[] photoBytes, String caption, List<TelegramButtonDto> buttons) {
+    if (photoBytes == null) {
       return;
     }
     var message =
         SendPhoto.builder()
             .chatId(chatId)
-            .photo(new InputFile(photoFileId))
+            .photo(new InputFile(new ByteArrayInputStream(photoBytes), "photo.jpg"))
             .caption(caption)
             .build();
     message.setReplyMarkup(buildInlineKeyboard(buttons));
@@ -98,8 +99,6 @@ public class TelegramMessageDispatcher {
 
     keyboardRows.add(row);
 
-    var markup = InlineKeyboardMarkup.builder().keyboard(keyboardRows).build();
-
-    return markup;
+    return InlineKeyboardMarkup.builder().keyboard(keyboardRows).build();
   }
 }
